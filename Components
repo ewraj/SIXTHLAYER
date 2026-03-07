@@ -1,0 +1,47 @@
+Got it. Short, clean, and grouped so your team can read it quickly in the repo.
+
+---
+
+# SixthLayer Hardware Overview
+
+## Armband (EMG Trigger)
+
+* SparkFun MyoWare 2 Muscle Sensor
+* ECG Snap Electrodes (Ag/AgCl)
+* Seeed Studio XIAO ESP32S3
+* 3.7V LiPo Battery (150–300 mAh)
+* TP4056 LiPo Charging Module
+* 30 AWG Silicone Wires
+* Elastic / Velcro Strap
+
+---
+
+# AR Glasses
+
+* Seeed Studio XIAO ESP32S3
+* 0.49" I2C OLED Display
+* Convex Lens
+* 45° Beam Splitter (Clear Acrylic)
+* Bone Conduction Speaker
+* MEMS Microphone (I2S)
+* 3.7V LiPo Battery (500–1000 mAh)
+* TP4056 Charging Module
+* 30 AWG Silicone Wires
+
+---
+
+# Vision Hub
+
+* MacBook Air M1
+* iPhone Camera (IP Webcam feed)
+
+---
+
+# Fabrication / Materials
+
+* Matte Black PETG / ASA Filament
+* TPU Filament (flexible parts)
+
+---
+
+If you want, I can also give you a **super clean README section layout (like big open-source projects use)** so your GitHub looks **very polished when judges open it.**
