@@ -1,0 +1,168 @@
+Good catch. Yes — **audio input should be part of the architecture**, even if it’s optional. That gives your system **two input modes**:
+
+```
+muscle trigger
+voice command
+```
+
+That actually makes SixthLayer look much more powerful in a demo.
+
+---
+
+# Updated SixthLayer Architecture
+
+Now the glasses node has **both input and output**.
+
+```id="aavt4r"
+EMG trigger (armband)
+        │
+        ▼
+Vision Hub (Mac)
+        ▲
+        │
+Voice commands (mic in glasses)
+```
+
+---
+
+# Updated Full Flow
+
+```id="9p8av4"
+User flexes muscle
+        │
+        ▼
+EMG armband detects signal
+        │
+        ▼
+ESP32 sends trigger
+        │
+        ▼
+Vision Hub processes camera feed
+        │
+        ▼
+Result sent to glasses
+        │
+        ▼
+OLED + bone speaker output
+```
+
+OR
+
+```
+User speaks command
+        │
+        ▼
+Glasses microphone captures audio
+        │
+        ▼
+ESP32 streams audio
+        │
+        ▼
+Mac processes speech
+        │
+        ▼
+Result returned
+        │
+        ▼
+Displayed on OLED
+```
+
+---
+
+# Updated System Flowchart
+
+```
+                 USER
+                   │
+      ┌────────────┴────────────┐
+      │                         │
+      ▼                         ▼
+ EMG Muscle Flex           Voice Command
+      │                         │
+      ▼                         ▼
+MyoWare Sensor           MEMS Microphone
+      │                         │
+      ▼                         ▼
+ESP32 Armband           ESP32 Glasses
+      │                         │
+      └────────────┬────────────┘
+                   ▼
+           Mac Vision Hub
+         (WebSocket Server)
+                   │
+                   ▼
+          Camera + AI Analysis
+                   │
+                   ▼
+            Result Generated
+                   │
+                   ▼
+             Glasses ESP32
+             │           │
+             ▼           ▼
+        OLED Display   Bone Speaker
+```
+
+---
+
+# Additional Component (Audio Input)
+
+Add this to **Glasses Node**:
+
+```id="0gbnpn"
+I2S MEMS microphone
+```
+
+Examples:
+
+* Adafruit SPH0645 I2S MEMS Microphone Breakout
+* Adafruit ICS‑43434 I2S MEMS Microphone Breakout
+
+These connect directly to the **XIAO ESP32S3 I2S pins**.
+
+---
+
+# Updated Glasses Hardware
+
+```
+XIAO ESP32S3
+│
+├── OLED display
+├── MEMS microphone
+├── bone conduction speaker
+├── LiPo battery
+└── TP4056 charger
+```
+
+---
+
+# Why this improves the project
+
+Instead of just a trigger system, your project becomes:
+
+```
+gesture interface
++ voice interface
++ AI perception
+```
+
+That’s basically a **multimodal wearable interface**.
+
+Hackathon judges love that word.
+
+---
+
+# Demo Example
+
+You could show:
+
+```
+flex muscle → identify person
+say "what building is this?" → AI answers
+```
+
+Now SixthLayer feels like a **real AR assistant**.
+
+---
+
+If you want, I can also draw a **much cleaner “system architecture diagram” (like Apple / Meta presentations)** you can drop straight into your README or hackathon slides. It’ll look way more professional than text flowcharts.
