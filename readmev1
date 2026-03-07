@@ -5,11 +5,11 @@ muscle trigger
 voice command
 ```
 
-That actually makes SixthLayer look much more powerful in a demo.
+That actually makes sxthlayer look much more powerful in a demo.
 
 ---
 
-# Updated SixthLayer Architecture
+# Updated sxthlayer Architecture
 
 Now the glasses node has **both input and output**.
 
@@ -161,7 +161,7 @@ flex muscle → identify person
 say "what building is this?" → AI answers
 ```
 
-Now SixthLayer feels like a **real AR assistant**.
+Now sxthlayer feels like a **real AR assistant**.
 
 ---
 
