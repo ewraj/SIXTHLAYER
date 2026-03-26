@@ -35,21 +35,11 @@ def analyze_image(image_path):
     # The "BRUTAL" Tactical Directive
     # -------------------------------------------------------------------------
     prompt = """
-    You are the vision-processing core for a tactical AR HUD.
-    Focus on the most interesting, relevant, or dangerous object or text in the frame.
-    
-    Tell the user what they are looking at naturally, but try to avoid obvious everyday stuff like a chair, watch, or wall.
-    
-    Output MUST be exactly one short, natural phrase.
-    It MUST be under 20 characters in total to fit on the HUD display.
-    
-    Examples:
-    Hostile detected
-    Keys left on table
-    Caution: Wet floor
-    Encrypted drive
-    
-    Do not add markdown, quotes, or any conversational filler. Just output the single phrase.
+    You are the vision module for a tactical AR HUD, but you act like a human tactical partner analyzing my video feed.
+    Tell me what I'm looking at in a natural, conversational way—like you are texting me.
+    Do Not restrict yourself to just one or two words; give me a couple of short sentences.
+    Focus on the most interesting, relevant, or dangerous objects/text in the frame. Avoid obvious everyday stuff.
+    Do not use formatting, category tags, or markdown. Just give me the raw text message.
     """
 
     try:
@@ -59,21 +49,8 @@ def analyze_image(image_path):
             contents=[image, prompt]
         )
         
-        # Enforce rules manually just in case the model hallucinates formatting
-        result = response.text.strip().upper()
-        
-        if '\n' in result:
-            result = result.split('\n')[0]
-            
-        if len(result) > 20:
-            result = result[:17] + "..."
-            
-        # Tactical UI Output
-        print("===================================")
-        print(" TELEMETRY STREAM ACQUIRED")
-        print("===================================")
-        print(f" >>  {result}")
-        print("===================================\n")
+        result = response.text.strip()
+        print(f"\n> {result}\n")
         
     except Exception as e:
         print(f"\n[!] V-CORE SYSTEM FAILURE: {e}\n")
