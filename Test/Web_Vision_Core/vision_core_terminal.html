@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIXTHLAYER Vision Core Terminal</title>
+    <script src="https://js.puter.com/v2/"></script>
+    <style>
+        body {
+            background-color: #000;
+            color: #0f0;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 20px;
+            height: 100vh;
+            width: 100vw;
+            box-sizing: border-box;
+            overflow-y: auto;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #terminal {
+            flex: 1;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            padding-bottom: 2rem;
+        }
+
+        #drop-zone {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 50, 0, 0.4);
+            border: 4px dashed #0f0;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #0f0;
+            font-size: 2rem;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+        }
+
+        body.dragover #drop-zone {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .line { margin-bottom: 4px; }
+        .blinking-cursor {
+            display: inline-block;
+            width: 10px;
+            height: 1.2em;
+            background-color: #0f0;
+            animation: blink 1s step-end infinite;
+            vertical-align: bottom;
+        }
+
+        @keyframes blink { 50% { opacity: 0; } }
+        
+        button#login-btn {
+            background: #0f0;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: bold;
+            cursor: pointer;
+            width: fit-content;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="drop-zone">DROP IMAGE TO ESTABLISH NEURAL LINK</div>
+    <div id="terminal">
+        <div class="line">SIXTHLAYER VISION CORE [Version 1.0.0]</div>
+        <div class="line">(c) Root Access Granted.</div>
+        <div class="line" id="status-line">System initializing...</div>
+    </div>
+    <div id="cursor-wrapper"><span class="blinking-cursor"></span></div>
+
+    <script>
+        const terminal = document.getElementById('terminal');
+        const statusLine = document.getElementById('status-line');
+        
+        const PROMPT = `You are the vision-processing core for a tactical AR HUD.
+Focus on the most relevant object, person, or text in the frame.
+Output MUST be exactly one line, under 20 characters in total, and strictly in this format:
+[CATEGORY]: [SUBJECT]
+
+Allowed Categories:
+- OBJ (Objects, gear, items)
+- ID (People, faces)
+- CAUTION (Hazards, warnings)
+- TEXT (Signs, documents)
+
+Examples:
+OBJ: COFFEE MUG
+CAUTION: STAIRS
+ID: UNKNOWN HOSTILE
+TEXT: AUTHORIZED ONLY
+
+Do not add markdown, quotes, or any conversational text. Just the single line.`;
+
+        function printLine(text, color = "#0f0") {
+            const div = document.createElement('div');
+            div.className = 'line';
+            div.style.color = color;
+            div.textContent = text;
+            terminal.appendChild(div);
+            window.scrollTo(0, document.body.scrollHeight);
+        }
+
+        async function init() {
+            try {
+                // Wait for puter
+                while (!window.puter || !puter.auth) {
+                    await new Promise(r => setTimeout(r, 100));
+                }
+                
+                if (!puter.auth.isSignedIn()) {
+                    statusLine.textContent = "AUTH REQUIRED. Waiting for token...";
+                    const btn = document.createElement('button');
+                    btn.id = 'login-btn';
+                    btn.textContent = "LOGIN VIA PUTER";
+                    btn.onclick = async () => {
+                        await puter.auth.signIn();
+                        btn.remove();
+                        startTerminal();
+                    };
+                    terminal.appendChild(btn);
+                } else {
+                    startTerminal();
+                }
+            } catch(e) {
+                printLine(`[ERROR] INIT FAILED: ${e.message}`, "#f00");
+            }
+        }
+
+        function startTerminal() {
+            statusLine.textContent = `[OK] NEURAL LINK ACTIVE. Drag and drop visual data here.`;
+        }
+
+        async function processImage(file) {
+            printLine(`\n> Analyzing visual data payload: ${file.name}...`);
+            
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                const dataUrl = e.target.result;
+                try {
+                    const payload = [{
+                        role: 'user', 
+                        content: [
+                            { type: 'text', text: PROMPT }, 
+                            { type: 'image_url', image_url: { url: dataUrl } }
+                        ]
+                    }];
+                    
+                    const response = await puter.ai.chat(payload);
+                    let result = response.message.content.trim().toUpperCase();
+                    
+                    // Enforce constraints securely
+                    if (result.includes('\\n')) result = result.split('\\n')[0];
+                    if (result.length > 20) result = result.substring(0, 17) + "...";
+                    
+                    printLine("===================================");
+                    printLine(" TELEMETRY STREAM ACQUIRED");
+                    printLine(` >>  ${result}`);
+                    printLine("===================================");
+                    
+                } catch(err) {
+                    printLine(`[!] V-CORE SYSTEM FAILURE: ${err.message}`, "#f00");
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Drag and Drop Logic
+        document.body.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            document.body.classList.add('dragover');
+        });
+
+        document.body.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            if (e.target.id === 'drop-zone') {
+                document.body.classList.remove('dragover');
+            }
+        });
+
+        document.body.addEventListener('drop', (e) => {
+            e.preventDefault();
+            document.body.classList.remove('dragover');
+            
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                processImage(file);
+            } else {
+                printLine(`[ERROR] Invalid file type. Must be an image.`, "#f00");
+            }
+        });
+
+        init();
+    </script>
+</body>
+</html>

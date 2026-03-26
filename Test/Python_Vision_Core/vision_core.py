@@ -36,24 +36,20 @@ def analyze_image(image_path):
     # -------------------------------------------------------------------------
     prompt = """
     You are the vision-processing core for a tactical AR HUD.
-    Focus on the most relevant object, person, or text in the frame.
+    Focus on the most interesting, relevant, or dangerous object or text in the frame.
     
-    Output MUST be exactly one line, under 20 characters in total, and strictly in this format:
-    [CATEGORY]: [SUBJECT]
+    Tell the user what they are looking at naturally, but try to avoid obvious everyday stuff like a chair, watch, or wall.
     
-    Allowed Categories:
-    - OBJ (Objects, gear, items)
-    - ID (People, faces)
-    - CAUTION (Hazards, warnings)
-    - TEXT (Signs, documents)
+    Output MUST be exactly one short, natural phrase.
+    It MUST be under 20 characters in total to fit on the HUD display.
     
     Examples:
-    OBJ: COLD ESPRESSO
-    CAUTION: STAIRS
-    ID: UNKNOWN ENTITY
-    TEXT: AUTHORIZED ONLY
+    Hostile detected
+    Keys left on table
+    Caution: Wet floor
+    Encrypted drive
     
-    Do not add markdown, quotes, or any conversational text. Just the single line.
+    Do not add markdown, quotes, or any conversational filler. Just output the single phrase.
     """
 
     try:
