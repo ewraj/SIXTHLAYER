@@ -92,23 +92,20 @@
         const statusLine = document.getElementById('status-line');
         
         const PROMPT = `You are the vision-processing core for a tactical AR HUD.
-Focus on the most relevant object, person, or text in the frame.
-Output MUST be exactly one line, under 20 characters in total, and strictly in this format:
-[CATEGORY]: [SUBJECT]
+Focus on the most interesting, relevant, or dangerous object or text in the frame.
 
-Allowed Categories:
-- OBJ (Objects, gear, items)
-- ID (People, faces)
-- CAUTION (Hazards, warnings)
-- TEXT (Signs, documents)
+Tell the user what they are looking at naturally, but try to avoid obvious everyday stuff like a chair, watch, or wall.
+
+Output MUST be exactly one short, natural phrase.
+It MUST be under 20 characters in total to fit on the HUD display.
 
 Examples:
-OBJ: COFFEE MUG
-CAUTION: STAIRS
-ID: UNKNOWN HOSTILE
-TEXT: AUTHORIZED ONLY
+Hostile detected
+Keys left on table
+Caution: Wet floor
+Encrypted drive
 
-Do not add markdown, quotes, or any conversational text. Just the single line.`;
+Do not add markdown, quotes, or any conversational filler. Just output the single phrase.`;
 
         function printLine(text, color = "#0f0") {
             const div = document.createElement('div');
