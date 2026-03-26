@@ -65,7 +65,7 @@
 
         @keyframes blink { 50% { opacity: 0; } }
         
-        button#login-btn {
+        button#login-btn, button#connect-btn {
             background: #0f0;
             color: #000;
             border: none;
@@ -76,6 +76,10 @@
             width: fit-content;
             margin-top: 10px;
         }
+
+        button#connect-btn {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -84,13 +88,32 @@
         <div class="line">SIXTHLAYER VISION CORE [Version 1.0.0]</div>
         <div class="line">(c) Root Access Granted.</div>
         <div class="line" id="status-line">System initializing...</div>
+        <button id="connect-btn">CONNECT ESP8266 HUD</button>
     </div>
     <div id="cursor-wrapper"><span class="blinking-cursor"></span></div>
 
     <script>
         const terminal = document.getElementById('terminal');
         const statusLine = document.getElementById('status-line');
-        
+        const connectBtn = document.getElementById('connect-btn');
+        let port, writer;
+
+        connectBtn.addEventListener('click', async () => {
+            try {
+                port = await navigator.serial.requestPort();
+                await port.open({ baudRate: 115200 });
+                const textEncoder = new TextEncoderStream();
+                textEncoder.readable.pipeTo(port.writable);
+                writer = textEncoder.writable.getWriter();
+                
+                printLine(`[OK] Hardware Uplink Established (115200 baud).`);
+                connectBtn.style.display = 'none';
+                writer.write("V-CORE SYNCED. STANDBY.\\n");
+            } catch (err) {
+                printLine(`[!] Hardware Sync Failed: ${err.message}`, "#f00");
+            }
+        });
+
         const PROMPT = `You are the vision module for a tactical AR HUD, but you act like a human tactical partner analyzing my video feed.
 Tell me what I'm looking at in a natural, conversational way—like you are texting me.
 Do Not restrict yourself to just one or two words; give me a couple of short sentences.
@@ -133,7 +156,14 @@ Do not use formatting, category tags, or markdown. Just give me the raw text mes
         }
 
         function startTerminal() {
-            statusLine.textContent = `[OK] NEURAL LINK ACTIVE. Drag and drop visual data here.`;
+            statusLine.textContent = `[OK] NEURAL LINK ACTIVE.`;
+            if ('serial' in navigator) {
+                connectBtn.style.display = 'block';
+                printLine(`Awaiting Hardware Uplink. Click 'CONNECT ESP8266 HUD' to bridge...`);
+            } else {
+                printLine(`[!] Web Serial not supported in this browser. Hardware Uplink unavailable.`, "#f00");
+            }
+            printLine(`Drop visual data anywhere to process.`);
         }
 
         async function processImage(file) {
@@ -152,9 +182,18 @@ Do not use formatting, category tags, or markdown. Just give me the raw text mes
                     }];
                     
                     const response = await puter.ai.chat(payload);
-                    let result = response.message.content.trim().toUpperCase();
+                    let result = response.message.content.trim();
                     
                     printLine(`\n> ${result}\n`);
+                    
+                    if (writer) {
+                        try {
+                            let safeResult = result.replace(/\\n/g, ' ') + '\\n';
+                            await writer.write(safeResult);
+                        } catch (e) {
+                            printLine(`[!] Failed to transmit to HUD: ${e.message}`, "#f00");
+                        }
+                    }
                     
                 } catch(err) {
                     printLine(`[!] V-CORE SYSTEM FAILURE: ${err.message}`, "#f00");
